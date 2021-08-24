@@ -14,7 +14,7 @@ public class ImageClickListener implements OnClickListener {
     Context context;
 
     //-----------------------------------------------------------
-    // imageID는 확대해서 보여줄 이미지의 리소스 ID입니다.
+    // imageID는 확대해서 보여줄 이미지의 리소스 ID
 
     int imageID;
 
