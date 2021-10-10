@@ -8,11 +8,11 @@ public class ImageGridActivity extends Activity {
 
     //------------------------------------------------------------
 
-    private int[] imageIDs = new int[] {
+    private int[] imageIDs = {
             R.drawable.shushu,
             R.drawable.bgg,
             R.drawable.bigmac,
-            R.drawable.burger,
+            //R.drawable.burger,
             R.drawable.cheese,
             R.drawable.double_bgg,
             R.drawable.double_cheese,
