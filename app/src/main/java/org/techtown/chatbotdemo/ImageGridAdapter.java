@@ -10,15 +10,23 @@ import android.widget.ImageView;
 
 public class ImageGridAdapter extends BaseAdapter {
 
-    Context context = null;
+    private Context context;
 
-    //-----------------------------------------------------------
+    public int[] imageIDs = new int[] {
+            R.drawable.shushu,
+            R.drawable.bgg,
+            R.drawable.bigmac,
+            //R.drawable.burger,
+            R.drawable.cheese,
+            R.drawable.double_bgg,
+            R.drawable.double_cheese,
+            R.drawable.egg_bgg,
+            R.drawable.mac_chicken,
+            R.drawable.shub,
+    };
 
-    int[] imageIDs = null;
-
-    public ImageGridAdapter(Context context, int[] imageIDs) {
+    public ImageGridAdapter(Context context) {
         this.context = context;
-        this.imageIDs = imageIDs;
     }
 
     public int getCount() {

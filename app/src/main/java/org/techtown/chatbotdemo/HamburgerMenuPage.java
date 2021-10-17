@@ -3,9 +3,12 @@ package org.techtown.chatbotdemo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -19,6 +22,17 @@ public class HamburgerMenuPage extends AppCompatActivity {
 
         GridView gridViewImages=(GridView)findViewById(R.id.gridViewImages);
         gridViewImages.setAdapter(new ImageAdapter(this));
+
+        gridViewImages.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // Sending image id to FullScreenActivity
+                Intent intent=new Intent(getApplicationContext(), ImageActivity.class);
+                // passing array index
+                intent.putExtra("id", i);
+                startActivity(intent);
+            }
+        });
     }
 
     public class ImageAdapter extends BaseAdapter {

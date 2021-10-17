@@ -12,22 +12,12 @@ public class ImageActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.simple_image);
 
-        //----------------------------------------------------------------
-        // 이미지 확대 view 설정
-        ImageView imageView = (ImageView)findViewById(R.id.imageView);
-        setImage(imageView);
-    }
+        Intent i=getIntent();
 
-    private void setImage(ImageView imageView) {
-        //----------------------------------------------------------------
-        // 초기 액티비티의 GridView 뷰의 이미지 항목을 클릭할 때 생성된 인텐트
-        // getIntent 메소드 호출하여 접근
-        Intent receivedIntent = getIntent();
+        int position=i.getExtras().getInt("id");
+        ImageGridAdapter imageAdapter=new ImageGridAdapter(this);
 
-        //----------------------------------------------------------------
-        // 이미지의 ID 인텐트 -> ImageView 이미지 리소스로 설정
-
-        int imageID = (Integer)receivedIntent.getExtras().get("image ID");
-        imageView.setImageResource(imageID);
+        ImageView imageView = (ImageView) findViewById(R.id.full_image_view);
+        imageView.setImageResource(imageAdapter.imageIDs[position]);
     }
 }
