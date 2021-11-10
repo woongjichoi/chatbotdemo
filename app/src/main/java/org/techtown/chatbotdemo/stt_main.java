@@ -24,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 // STT는 주석처리하고 음성 녹음만 우선 구현함
-// 에뮬레이터에서 녹음되는지 확인해보려면 점 세개 > Microphone > 전부 초록색으로
+// 에뮬레이터에서 녹음되는지 확인해보려면 점 세개 > Microphone > 전부 초록색으로!
 
 public class stt_main extends AppCompatActivity {
     MediaRecorder recorder;
