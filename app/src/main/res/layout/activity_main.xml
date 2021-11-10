@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Macdonald"
+        android:text="Mcdonald"
         android:textSize="50dp" />
 
     <TextView
@@ -25,7 +25,19 @@
         android:id="@+id/sttStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="STT" />
+        android:text="start" />
+
+    <Button
+        android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop" />
+
+    <Button
+        android:id="@+id/record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="play" />
 
     <LinearLayout
         android:layout_marginTop="20dp"
