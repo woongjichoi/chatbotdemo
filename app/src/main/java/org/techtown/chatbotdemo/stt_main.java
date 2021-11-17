@@ -1,6 +1,7 @@
 package org.techtown.chatbotdemo;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -19,14 +20,32 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-// STT는 주석처리하고 음성 녹음만 우선 구현함
-// 에뮬레이터에서 녹음되는지 확인해보려면 점 세개 > Microphone > 전부 초록색으로!
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+
+// 자막 띄우려고 지은이가 구현한 STT는 우선 주석 처리함
+// ★ 에뮬레이터에서 녹음되는지 확인해보려면 점 세개 > Microphone > 전부 초록색으로!
 
 public class stt_main extends AppCompatActivity {
+    DriveServiceHelper driveServiceHelper;
+
     MediaRecorder recorder;
     String fileName;
     MediaPlayer player;
@@ -35,6 +54,7 @@ public class stt_main extends AppCompatActivity {
     Button sttBtn; // 누르면 녹음 시작
     Button stop; // 누르면 녹음 중지
     Button record; // 누르면 녹음 재생
+    Button uploadBtn; // 누르면 구글 드라이브에 올려짐
 
     /*
     Intent intent;
@@ -49,8 +69,10 @@ public class stt_main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        requestSignIn();
+
         fileName=getExternalCacheDir().getAbsolutePath();
-        fileName+="/audiorecordtest.3gp";
+        fileName+="/audiorecordtest.3gp"; // 녹음된 파일이 저장된 경로
 
         sttBtn=(Button)findViewById(R.id.sttStart);
         sttBtn.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +97,8 @@ public class stt_main extends AppCompatActivity {
                 playAudio();
             }
         });
+
+        uploadBtn=(Button)findViewById(R.id.uploadbutton);
 
         /*
         // 퍼미션 체크
@@ -102,6 +126,84 @@ public class stt_main extends AppCompatActivity {
 
         });
         */
+    }
+
+    private void requestSignIn(){
+        GoogleSignInOptions signInOptions=new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+                .build();
+
+        GoogleSignInClient client= GoogleSignIn.getClient(this, signInOptions);
+        startActivityForResult(client.getSignInIntent(), 400);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case 400:
+                if (resultCode==RESULT_OK){
+                    handleSignInIntent(data);
+                }
+                break;
+        }
+    }
+
+    private void handleSignInIntent(Intent data) {
+        GoogleSignIn.getSignedInAccountFromIntent(data)
+                .addOnSuccessListener(new OnSuccessListener<GoogleSignInAccount>() {
+                    @Override
+                    public void onSuccess(GoogleSignInAccount googleSignInAccount) {
+                        GoogleAccountCredential credential=GoogleAccountCredential.
+                                usingOAuth2(stt_main.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+
+                        credential.setSelectedAccount(googleSignInAccount.getAccount());
+
+                        Drive googleDriveService=new Drive.Builder(
+                                AndroidHttp.newCompatibleTransport(),
+                                new GsonFactory(),
+                                credential)
+                                .setApplicationName("chatbotdemo")
+                                .build();
+
+                        driveServiceHelper=new DriveServiceHelper(googleDriveService);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+    }
+
+    public void uploadAudioFile(View v){
+        ProgressDialog progressDialog=new ProgressDialog(stt_main.this);
+        progressDialog.setTitle("Uploading to google drive");
+        progressDialog.setMessage("Please wait..");
+        progressDialog.show();
+
+        String filePath=fileName;
+
+        driveServiceHelper.createFileMp3(filePath).addOnSuccessListener(new OnSuccessListener<String>() {
+            @Override
+            public void onSuccess(String s) {
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "Uploaded successfully", Toast.LENGTH_LONG).show();
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Check your google drive api key", Toast.LENGTH_LONG).show();
+
+                    }
+                });
+
     }
 
     public void recordAudio(){
